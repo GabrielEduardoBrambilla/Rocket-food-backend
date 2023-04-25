@@ -12,6 +12,6 @@ function userTypeVerifier(req, res, next) {
   next()
 }
 
-routes.use('/users', userTypeVerifier, usersRouter)
+routes.use('/users', usersRouter)
 
 module.exports = routes

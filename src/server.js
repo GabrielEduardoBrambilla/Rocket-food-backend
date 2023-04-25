@@ -7,6 +7,7 @@ const express = require('express')
 const routes = require('./routes')
 
 migrationsRunner()
+
 const app = express()
 
 app.use(express.json())
