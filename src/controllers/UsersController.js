@@ -20,13 +20,13 @@ class UsersController {
     )
 
     if (checkUserExist) {
-      throw new AppError('Este email já foi registrado')
+      throw new AppError('Este email já foi registrado').statusCode(500)
     }
 
     const hashedPassword = await hash(password, 8)
 
     await database.run(
-      'INSERT INTO users (Is_Admin, email, password) VALUES (?,?,?)',
+      'INSERT INTO users (is_Admin, email, password) VALUES (?,?,?)',
       [Is_Admin, email, hashedPassword]
     )
 
