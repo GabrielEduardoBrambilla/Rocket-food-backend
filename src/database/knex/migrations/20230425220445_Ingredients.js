@@ -3,7 +3,11 @@ exports.up = knex =>
     table.increments('id').primary()
     table.string('name', 255).notNullable()
     table.bigInteger('id_Dishes').unsigned().notNullable()
-    table.foreign('id_Dishes').references('id').inTable('dishes')
+    table
+      .foreign('id_Dishes')
+      .references('id')
+      .inTable('dishes')
+      .onDelete('CASCADE')
     table.index('name')
   })
 
