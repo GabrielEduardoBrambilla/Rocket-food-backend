@@ -1,13 +1,13 @@
 exports.up = knex =>
-  knex.schema.createTable('Shopping_Cart', function (table) {
+  knex.schema.createTable('shopping_Cart', function (table) {
     table.increments('id').primary()
-    table.bigInteger('Id_User').unsigned().notNullable()
-    table.bigInteger('Id_Dish').unsigned().notNullable()
-    table.integer('Quantity').notNullable()
-    table.foreign('Id_User').references('id').inTable('Users')
-    table.foreign('Id_Dish').references('id').inTable('Dishes')
-    table.index('Id_User')
-    table.index('Id_Dish')
+    table.bigInteger('id_User').unsigned().notNullable()
+    table.bigInteger('id_Dish').unsigned().notNullable()
+    table.integer('quantity').notNullable()
+    table.foreign('id_User').references('id').inTable('users')
+    table.foreign('id_Dish').references('id').inTable('dishes')
+    table.index('id_User')
+    table.index('id_Dish')
   })
 
-exports.down = knex => knex.schema.dropTable('Shopping_Cart')
+exports.down = knex => knex.schema.dropTable('shopping_Cart')

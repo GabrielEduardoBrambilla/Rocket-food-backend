@@ -14,7 +14,7 @@ module.exports = {
         'knex',
         'migrations'
       )
-    }
-  },
-  useNullAsDefault: true
+    },
+    useNullAsDefault: true
+  }
 }

@@ -1,15 +1,15 @@
 exports.up = knex =>
-  knex.schema.createTable('Orders', function (table) {
+  knex.schema.createTable('orders', function (table) {
     table.increments('id').primary()
     table
-      .enu('Status', ['received', 'preparing', 'delivering', 'delivered'])
+      .enu('status', ['received', 'preparing', 'delivering', 'delivered'])
       .notNullable()
       .defaultTo('received')
-    table.bigInteger('Id_User').unsigned().notNullable()
-    table.integer('Total_Price').notNullable()
-    table.dateTime('Created_at').notNullable()
-    table.foreign('Id_User').references('id').inTable('Users')
-    table.index('Id_User')
+    table.bigInteger('id_User').unsigned().notNullable()
+    table.integer('total_Price').notNullable()
+    table.dateTime('created_at').notNullable()
+    table.foreign('id_User').references('id').inTable('users')
+    table.index('id_User')
   })
 
-exports.down = knex => knex.schema.dropTable('Orders')
+exports.down = knex => knex.schema.dropTable('orders')

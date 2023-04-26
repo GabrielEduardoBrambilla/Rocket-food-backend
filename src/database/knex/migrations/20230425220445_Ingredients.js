@@ -1,10 +1,10 @@
 exports.up = knex =>
-  knex.schema.createTable('Ingredients', function (table) {
+  knex.schema.createTable('ingredients', function (table) {
     table.increments('id').primary()
-    table.string('Name', 255).notNullable()
-    table.bigInteger('Id_Dishes').unsigned().notNullable()
-    table.foreign('Id_Dishes').references('id').inTable('Dishes')
-    table.index('Name')
+    table.string('name', 255).notNullable()
+    table.bigInteger('id_Dishes').unsigned().notNullable()
+    table.foreign('id_Dishes').references('id').inTable('dishes')
+    table.index('name')
   })
 
-exports.down = knex => knex.schema.dropTable('Ingredients')
+exports.down = knex => knex.schema.dropTable('ingredients')
