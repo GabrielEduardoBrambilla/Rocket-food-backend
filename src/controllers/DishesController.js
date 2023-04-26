@@ -1,31 +1,5 @@
 const knex = require('../database/knex')
 
-const createDishWithIngredients = async dish => {
-  try {
-    const { Ingredients, ...dishData } = dish
-    const trxResult = await knex.transaction(async trx => {
-      // Insert the dish and get its ID
-      const [dishId] = await trx('Dishes').insert(dishData)
-
-      // Insert the ingredients
-      const ingredientsData = Ingredients.map(ingredient => {
-        return {
-          Name: ingredient.Name,
-          Id_Dishes: dishId
-        }
-      })
-      await trx('Ingredients').insert(ingredientsData)
-
-      return dishId
-    })
-
-    return { dishId: trxResult }
-  } catch (error) {
-    console.error(error)
-    throw new Error('Error creating dish with ingredients')
-  }
-}
-
 class DishesController {
   // Um controller tem no máximo 5 metodos
   // Index - GET listar varios registros
@@ -41,7 +15,9 @@ class DishesController {
     const checkDishExists = await knex('dishes').where({ name }).first()
 
     if (checkDishExists) {
-      return response.json('Dish with name ' + name + ' already exists')
+      return response
+        .status(400)
+        .json('Dish with name ' + name + ' already exists')
     }
     const [id_Dishes] = await knex('dishes').insert({
       price,
@@ -82,46 +58,48 @@ class DishesController {
     return response.json()
   }
 
-  /*
   async index(request, response) {
-    const { title, tags } = requests.query
+    const { name, ingredients } = request.query
 
-    const user_id = request.user.id
+    // const user_id = request.user.id
 
-    let notes
+    let dishes
 
-    if (tags) {
-      const filterTags = tags.split(',').map(tag => tag)
+    if (ingredients) {
+      const filterIngredients = ingredients
+        .split(',')
+        .map(ingredients => ingredients)
 
-      notes = await knex('tags')
-        .select(['notes.id', 'notes.title', 'notes.user_id'])
-        .where('notes.user_id', user_id)
-        .whereLike('notes.title', `%${title}%`)
-        .whereIn('tags.name', filterTags)
-        .innerJoin('notes', 'notes.id', 'tags.note_id')
-        .groupBy('notes.id')
-        .orderBy('notes.title')
+      dishes = await knex('ingredients')
+        .select(['id_Dishes', 'ingredients.name'])
+        .whereLike('ingredients.name', `%${name}%`)
+        .whereIn('ingredients.name', filterIngredients)
+        .innerJoin('dishes', 'dishes.id', 'ingredients.id_Dishes')
+        .groupBy('ingredients.id')
+        .orderBy('ingredients.name')
     } else {
-      notes = await knex('notes')
-        .where({ user_id })
-        .whereLike('title', `%${title}%`)
-        .orderBy('title')
+      dishes = await knex('dishes')
+        .whereLike('name', `%${name}%`)
+        .orderBy('name')
     }
+    console.log(dishes)
+    return response.json(dishes)
 
-    const userTags = await knex('tags').where({ user_id })
+    const allDishes = await knex('dishes')
 
-    const notesWithTags = notes.map(note => {
-      const noteTags = userTags.filter(tag => tag.note_id === note.id)
+    const dishesWithIngredients = dishes.map(dishes => {
+      const dishesIngredients = allDishes.filter(
+        ingredients => ingredients.id_Dishes === dishes.id
+      )
 
       return {
-        ...note,
-        tags: noteTags
+        ...dishes,
+        ingredients: dishesIngredients
       }
     })
 
-    return response.json(notesWithTags)
+    return response.json(dishes)
   }
-  */
 }
 
 module.exports = DishesController

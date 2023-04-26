@@ -1,6 +1,7 @@
 const sqliteConnection = require('../database/sqlite')
 const AppError = require('../utils/AppError')
 const { hash, compare } = require('bcryptjs')
+const knex = require('../database/knex')
 
 class UsersController {
   // Um controller tem no máximo 5 metodos
@@ -31,6 +32,13 @@ class UsersController {
     )
 
     return response.status(201).json()
+  }
+
+  async delete(request, response) {
+    const { id } = request.body
+    await knex('users').where({ id }).delete()
+
+    return response.json()
   }
 }
 

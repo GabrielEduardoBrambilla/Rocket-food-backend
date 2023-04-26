@@ -6,7 +6,6 @@ exports.up = knex =>
     table.string('image', 255).notNullable()
     table.enum('category', ['meal', 'desert', 'beverage']).notNullable()
     table.string('description', 255).notNullable()
-    table.integer('id_Ingredients').unsigned()
     table
       .foreign('id_Ingredients')
       .references('id')
