@@ -1,8 +1,30 @@
 const knex = require('../database/knex')
 
-class DishesController {
+class Shopping_cartController {
   async create(request, response) {
     const { id_User, id_Dish, quantity } = request.body
+
+    const checkDishExists = await knex('shopping_cart')
+      .select('id')
+      .where({ id_User, id_Dish })
+      .first()
+
+    if (checkDishExists) {
+      const itemCart = await knex('shopping_cart')
+        .select()
+        .where({ id_User, id_Dish })
+        .first()
+      await knex('shopping_cart')
+        .update({ quantity: quantity })
+        .where({ id: itemCart.id })
+      const updatedItemCart = await knex('shopping_cart')
+        .select()
+        .where({ id: itemCart.id })
+        .first()
+      return response.json({
+        Message: `Dish quantity updated to cart | Quant= ${updatedItemCart.quantity}`
+      })
+    }
 
     const [id_shopping_cart] = await knex('shopping_cart').insert({
       id_User,
@@ -11,7 +33,7 @@ class DishesController {
     })
 
     return response.json({
-      Message: `Dish add to favorites ${id_shopping_cart}`,
+      Message: `Dish add to cart | Quant2= ${quantity}`,
       Component: id_shopping_cart
     })
   }
@@ -81,4 +103,4 @@ class DishesController {
   }
 }
 
-module.exports = DishesController
+module.exports = Shopping_cartController

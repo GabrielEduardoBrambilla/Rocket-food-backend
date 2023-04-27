@@ -4,13 +4,6 @@ const { hash, compare } = require('bcryptjs')
 const knex = require('../database/knex')
 
 class UsersController {
-  // Um controller tem no máximo 5 metodos
-  // Index - GET listar varios registros
-  // show - GET listar registro especifico
-  // create - POST para criar um registro
-  // update - PUT para atualizar um registro
-  // delete - DELETE para deletar um registro
-
   async create(request, response) {
     const { Is_Admin, email, password } = request.body
 

@@ -1,12 +1,12 @@
 const { Router } = require('express')
 const shopping_cartRoutes = Router()
 
-const ShoppingCart = require('../controllers/ShoppingCartController')
-const shoppingCartController = new Shopping_cartController()
+const ShoppingCartController = require('../controllers/ShoppingCartController')
+const shoppingCartController = new ShoppingCartController()
 
-shoppingCartController.post('/', shoppingCartController.create)
-shoppingCartController.get('/show', shoppingCartController.show)
-shoppingCartController.delete('/delete', shoppingCartController.delete)
-shoppingCartController.get('/index', shoppingCartController.index)
+shopping_cartRoutes.post('/', shoppingCartController.create)
+shopping_cartRoutes.get('/show', shoppingCartController.show)
+shopping_cartRoutes.delete('/delete', shoppingCartController.delete)
+shopping_cartRoutes.get('/index', shoppingCartController.index)
 
-module.exports = dishesRoutes
+module.exports = shopping_cartRoutes
