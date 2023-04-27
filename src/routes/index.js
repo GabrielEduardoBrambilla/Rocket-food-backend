@@ -2,6 +2,7 @@ const { Router } = require('express')
 
 const usersRouter = require('./users.routes')
 const dishesRouter = require('./dishes.routes')
+const favorite_listRouter = require('./favoriteList.routes')
 
 const routes = Router()
 
@@ -15,5 +16,6 @@ function userTypeVerifier(req, res, next) {
 
 routes.use('/users', usersRouter)
 routes.use('/dishes', dishesRouter)
+routes.use('/favoritelist', favorite_listRouter)
 
 module.exports = routes

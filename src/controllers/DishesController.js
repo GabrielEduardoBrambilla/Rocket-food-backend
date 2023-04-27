@@ -59,46 +59,40 @@ class DishesController {
   }
 
   async index(request, response) {
-    const { name, ingredients } = request.query
+    const { q } = request.query
 
-    // const user_id = request.user.id
+    try {
+      let dishes = await knex('dishes')
 
-    let dishes
+      if (q) {
+        dishes = await knex('dishes')
+          .where('name', 'like', `%${q}%`)
+          .orWhere('description', 'like', `%${q}%`)
+      }
 
-    if (ingredients) {
-      const filterIngredients = ingredients
-        .split(',')
-        .map(ingredients => ingredients)
+      const dishesWithIngredients = await Promise.all(
+        dishes.map(async dish => {
+          const ingredients = await knex('dishes_ingredients')
+            .select('ingredients.name')
+            .join(
+              'ingredients',
+              'dishes_ingredients.ingredient_id',
+              'ingredients.id'
+            )
+            .where('dishes_ingredients.dish_id', dish.id)
 
-      dishes = await knex('ingredients')
-        .select(['id_Dishes', 'ingredients.name'])
-        .whereLike('ingredients.name', `%${name}%`)
-        .whereIn('ingredients.name', filterIngredients)
-        .innerJoin('dishes', 'dishes.id', 'ingredients.id_Dishes')
-        .groupBy('ingredients.id')
-        .orderBy('ingredients.name')
-    } else {
-      dishes = await knex('dishes')
-        .whereLike('name', `%${name}%`)
-        .orderBy('name')
-    }
-    console.log(dishes)
-    return response.json(dishes)
-
-    const allDishes = await knex('dishes')
-
-    const dishesWithIngredients = dishes.map(dishes => {
-      const dishesIngredients = allDishes.filter(
-        ingredients => ingredients.id_Dishes === dishes.id
+          return {
+            ...dish,
+            ingredients
+          }
+        })
       )
 
-      return {
-        ...dishes,
-        ingredients: dishesIngredients
-      }
-    })
-
-    return response.json(dishes)
+      return response.json(dishesWithIngredients)
+    } catch (error) {
+      console.error(error)
+      return response.status(500).json({ message: 'Internal server error' })
+    }
   }
 }
 

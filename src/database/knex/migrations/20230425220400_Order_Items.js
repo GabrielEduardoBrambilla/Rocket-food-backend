@@ -1,5 +1,5 @@
 exports.up = knex =>
-  knex.schema.createTable('order_Items', function (table) {
+  knex.schema.createTable('order_items', function (table) {
     table.increments('id').primary()
     table.bigInteger('id_Dish').unsigned().notNullable()
     table.bigInteger('id_Order').unsigned().notNullable()
