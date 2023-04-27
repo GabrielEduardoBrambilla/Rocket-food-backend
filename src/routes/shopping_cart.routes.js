@@ -8,5 +8,6 @@ shopping_cartRoutes.post('/', shoppingCartController.create)
 shopping_cartRoutes.get('/show', shoppingCartController.show)
 shopping_cartRoutes.delete('/delete', shoppingCartController.delete)
 shopping_cartRoutes.get('/index', shoppingCartController.index)
+shopping_cartRoutes.put('/update', shoppingCartController.update)
 
 module.exports = shopping_cartRoutes

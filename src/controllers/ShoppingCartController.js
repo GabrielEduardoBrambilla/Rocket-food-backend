@@ -37,33 +37,6 @@ class Shopping_cartController {
       Component: id_shopping_cart
     })
   }
-  async show(request, response) {
-    const { id_User, id_Dish } = request.body
-    const checkDishIsFavorite = await knex('favorite_list')
-      .select()
-      .where({ id_User, id_Dish })
-      .first()
-    if (checkDishIsFavorite) {
-      const dish = await knex('dishes').where({ id: id_Dish }).first()
-      const ingredients = await knex('ingredients')
-        .where({ id_Dishes: id_Dish })
-        .orderBy('name')
-
-      return response.json({
-        ...dish,
-        ingredients
-      })
-    } else {
-      return response.status(400).json('Dish is not favorite')
-    }
-  }
-  async delete(request, response) {
-    const { id_User, id_Dish } = request.body
-
-    await knex('favorite_list').where({ id_Dish, id_User }).delete()
-
-    return response.json('removed from favorites')
-  }
   async index(request, response) {
     const { id_User } = request.body
 
@@ -100,6 +73,53 @@ class Shopping_cartController {
     } else {
       return response.status(400).json('User does not have a favorite list')
     }
+  }
+  async show(request, response) {
+    const { id_User, id_Dish } = request.body
+    const checkDishIsFavorite = await knex('favorite_list')
+      .select()
+      .where({ id_User, id_Dish })
+      .first()
+    if (checkDishIsFavorite) {
+      const dish = await knex('dishes').where({ id: id_Dish }).first()
+      const ingredients = await knex('ingredients')
+        .where({ id_Dishes: id_Dish })
+        .orderBy('name')
+
+      return response.json({
+        ...dish,
+        ingredients
+      })
+    } else {
+      return response.status(400).json('Dish is not favorite')
+    }
+  }
+  async update(request, response) {
+    const { id, quantity } = request.body
+
+    if (typeof quantity !== 'number') quantity = parseInt(quantity)
+
+    if (quantity === 0) {
+      await knex('shopping_cart').where({ id }).delete()
+      return response.json('Removed from cart')
+    }
+
+    await knex('shopping_cart').update({ quantity }).where({ id })
+
+    const updatedItemCart = await knex('shopping_cart')
+      .select()
+      .where({ id })
+      .first()
+    return response.json({
+      Message: `Dish quantity updated to cart | Quant= ${updatedItemCart.quantity}`
+    })
+  }
+  async delete(request, response) {
+    const { id } = request.body
+
+    await knex('shopping_cart').where({ id }).delete()
+
+    return response.json('removed from cart by delete argument')
   }
 }
 
