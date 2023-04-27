@@ -4,6 +4,7 @@ const usersRouter = require('./users.routes')
 const dishesRouter = require('./dishes.routes')
 const favorite_ListRouter = require('./favoriteList.routes')
 const shopping_Cart = require('./shopping_cart.routes')
+const ingredients = require('./ingredients.routes')
 
 const routes = Router()
 
@@ -19,5 +20,6 @@ routes.use('/users', usersRouter)
 routes.use('/dishes', dishesRouter)
 routes.use('/favoritelist', favorite_ListRouter)
 routes.use('/shoppingcart', shopping_Cart)
+routes.use('/ingredients', ingredients)
 
 module.exports = routes
