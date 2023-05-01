@@ -21,5 +21,6 @@ routes.use('/dishes', dishesRouter)
 routes.use('/favoritelist', favorite_ListRouter)
 routes.use('/shoppingcart', shopping_Cart)
 routes.use('/ingredients', ingredients)
+routes.use('/order', ingredients)
 
 module.exports = routes
