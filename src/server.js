@@ -16,10 +16,12 @@ app.use(routes)
 app.use((error, request, response, next) => {
   const fileName = __filename.split('/').pop()
   if (error instanceof AppError) {
-    console.error(`${fileName}: ${error}`)
+    console.error(`${fileName}: ${error} ${error.statusCode}`)
+
     return response.status(error.statusCode).json({
       status: 'error',
-      message: error.message
+      message: error.message,
+      statusCode: error.statusCode
     })
   }
 

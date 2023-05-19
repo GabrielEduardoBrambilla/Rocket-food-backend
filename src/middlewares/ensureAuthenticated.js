@@ -9,7 +9,7 @@ function ensureAuthenticated(request, response, next) {
     throw new AppError('JWT Token não informado', 401)
   }
 
-  const [, token] = authHeader.split('')
+  const [, token] = authHeader.split(' ')
 
   try {
     const { sub: user_id } = verify(token, authConfig.jwt.secret)
@@ -20,7 +20,9 @@ function ensureAuthenticated(request, response, next) {
 
     return next()
   } catch {
-    throw new AppError('JWT Token invalido', 401)
+    console.log('JWT Token invalido')
+
+    throw new AppError('JWT Token invalido', 400)
   }
 }
 

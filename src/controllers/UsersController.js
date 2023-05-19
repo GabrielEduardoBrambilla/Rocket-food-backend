@@ -28,8 +28,8 @@ class UsersController {
   }
 
   async delete(request, response) {
-    const user_id = request.user.id
-    await knex('users').where({ user_id }).delete()
+    const { id } = request.body
+    await knex('users').where({ id }).delete()
 
     return response.json()
   }
