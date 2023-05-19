@@ -2,17 +2,17 @@ const knex = require('../database/knex')
 
 class Shopping_cartController {
   async create(request, response) {
-    const { id_User, id_Dish, quantity } = request.body
+    const { id_user, id_dish, quantity } = request.body
 
     const checkDishExists = await knex('shopping_cart')
       .select('id')
-      .where({ id_User, id_Dish })
+      .where({ id_user, id_dish })
       .first()
 
     if (checkDishExists) {
       const itemCart = await knex('shopping_cart')
         .select()
-        .where({ id_User, id_Dish })
+        .where({ id_user, id_dish })
         .first()
       await knex('shopping_cart')
         .update({ quantity: quantity })
@@ -27,8 +27,8 @@ class Shopping_cartController {
     }
 
     const [id_shopping_cart] = await knex('shopping_cart').insert({
-      id_User,
-      id_Dish,
+      id_user,
+      id_dish,
       quantity
     })
 
@@ -38,34 +38,34 @@ class Shopping_cartController {
     })
   }
   async index(request, response) {
-    const { id_User } = request.body
+    const { id_user } = request.body
 
     const favoriteList = await knex('favorite_list')
-      .select('id_Dish')
-      .where({ id_User })
+      .select('id_dish')
+      .where({ id_user })
       .first()
 
     if (favoriteList) {
       const dishIds = await knex('favorite_list')
-        .select('id_Dish')
-        .where({ id_User })
+        .select('id_dish')
+        .where({ id_user })
 
       const dishes = await knex('dishes').whereIn(
         'id',
-        dishIds.map(dish => dish.id_Dish)
+        dishIds.map(dish => dish.id_dish)
       )
 
       const ingredients = await knex('ingredients')
         .whereIn(
-          'id_Dishes',
-          dishIds.map(dish => dish.id_Dish)
+          'id_dishes',
+          dishIds.map(dish => dish.id_dish)
         )
-        .orderBy(['id_Dishes', 'name'])
+        .orderBy(['id_dishes', 'name'])
 
       const meals = dishes.map(dish => ({
         ...dish,
         ingredients: ingredients.filter(
-          ingredient => ingredient.id_Dishes === dish.id
+          ingredient => ingredient.id_dishes === dish.id
         )
       }))
 
@@ -75,15 +75,15 @@ class Shopping_cartController {
     }
   }
   async show(request, response) {
-    const { id_User, id_Dish } = request.body
+    const { id_user, id_dish } = request.body
     const checkDishIsFavorite = await knex('favorite_list')
       .select()
-      .where({ id_User, id_Dish })
+      .where({ id_user, id_dish })
       .first()
     if (checkDishIsFavorite) {
-      const dish = await knex('dishes').where({ id: id_Dish }).first()
+      const dish = await knex('dishes').where({ id: id_dish }).first()
       const ingredients = await knex('ingredients')
-        .where({ id_Dishes: id_Dish })
+        .where({ id_dishes: id_dish })
         .orderBy('name')
 
       return response.json({

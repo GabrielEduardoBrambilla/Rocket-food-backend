@@ -30,7 +30,7 @@ class DishesController {
     const ingredientsInsert = ingredients.map(name => {
       return {
         name,
-        id_Dishes
+        id_dishes
       }
     })
     await knex('ingredients').insert(ingredientsInsert)
@@ -43,7 +43,7 @@ class DishesController {
 
     const dish = await knex('dishes').where({ id }).first()
     const ingredients = await knex('ingredients')
-      .where({ id_Dishes: id })
+      .where({ id_dishes: id })
       .orderBy('name')
 
     return response.json({

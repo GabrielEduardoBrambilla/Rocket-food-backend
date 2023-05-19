@@ -2,9 +2,9 @@ exports.up = knex =>
   knex.schema.createTable('ingredients', function (table) {
     table.increments('id').primary()
     table.string('name', 255).notNullable()
-    table.bigInteger('id_Dishes').unsigned().notNullable()
+    table.bigInteger('id_dishes').unsigned().notNullable()
     table
-      .foreign('id_Dishes')
+      .foreign('id_dishes')
       .references('id')
       .inTable('dishes')
       .onDelete('CASCADE')
