@@ -8,34 +8,74 @@ class DishesController {
   // update - PUT para atualizar um registro
   // delete - DELETE para deletar um registro
 
+  // async create(request, response) {
+  //   const { price, name, category, description, ingredients } = request.body
+
+  //   const dishImage = request.file.filename
+
+  //   const checkDishExists = await knex('dishes').where({ name }).first()
+
+  //   if (checkDishExists) {
+  //     return response
+  //       .status(400)
+  //       .json('Dish with name ' + name + ' already exists')
+  //   }
+  //   const [id_dishes] = await knex('dishes').insert({
+  //     price,
+  //     name,
+  //     image: dishImage,
+  //     category,
+  //     description
+  //   })
+
+  //   const ingredientsInsert = ingredients.map(name => {
+  //     return {
+  //       name,
+  //       id_dishes
+  //     }
+  //   })
+  //   await knex('ingredients').insert(ingredientsInsert)
+
+  //   return response.json()
+  // }
+
   async create(request, response) {
-    const { price, name, image, category, description, ingredients } =
-      request.body
+    const { price, name, category, description, ingredients } = request.body
+    const dishImage = request.file.filename
 
     const checkDishExists = await knex('dishes').where({ name }).first()
-
     if (checkDishExists) {
       return response
         .status(400)
         .json('Dish with name ' + name + ' already exists')
     }
-    const [id_Dishes] = await knex('dishes').insert({
-      price,
-      name,
-      image,
-      category,
-      description
-    })
 
-    const ingredientsInsert = ingredients.map(name => {
-      return {
-        name,
-        id_dishes
-      }
-    })
-    await knex('ingredients').insert(ingredientsInsert)
+    try {
+      await knex.transaction(async transaction => {
+        const [idDishes] = await transaction('dishes').insert({
+          price,
+          name,
+          image: dishImage,
+          category,
+          description
+        })
+        console.log(ingredients.all)
+        const ingredientsInsert = ingredients.map(ingredientName => {
+          return {
+            name: ingredientName,
+            id_dishes: idDishes
+          }
+        })
 
-    return response.json()
+        await transaction('ingredients').insert(ingredientsInsert)
+      })
+
+      return response.json()
+    } catch (error) {
+      // Handle any errors that occur during the transaction
+      console.log(error)
+      return response.status(500).json('Error creating dish')
+    }
   }
 
   async show(request, response) {

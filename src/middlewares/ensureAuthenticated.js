@@ -20,8 +20,6 @@ function ensureAuthenticated(request, response, next) {
 
     return next()
   } catch {
-    console.log('JWT Token invalido')
-
     throw new AppError('JWT Token invalido', 400)
   }
 }

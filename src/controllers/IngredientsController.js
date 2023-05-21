@@ -1,34 +1,34 @@
 const knex = require('../database/knex')
 
 class IngredientsController {
-  async create(request, response) {
-    const { id_user, id_dish } = request.body
+  // async create(request, response) {
+  //   const { id_user, id_dish } = request.body
 
-    const checkDishIsFavorite = await knex('favorite_list')
-      .select()
-      .where({ id_user, id_dish })
-      .first()
+  //   const checkDishIsFavorite = await knex('favorite_list')
+  //     .select()
+  //     .where({ id_user, id_dish })
+  //     .first()
 
-    const dishName = await knex('dishes')
-      .select('name')
-      .where('dishes.id', id_dish)
-      .first()
+  //   const dishName = await knex('dishes')
+  //     .select('name')
+  //     .where('dishes.id', id_dish)
+  //     .first()
 
-    if (checkDishIsFavorite) {
-      return response
-        .status(400)
-        .json('Dish ' + dishName.name + ' already in favorites')
-    }
-    const [id_favorite_list] = await knex('favorite_list').insert({
-      id_user,
-      id_dish
-    })
+  //   if (checkDishIsFavorite) {
+  //     return response
+  //       .status(400)
+  //       .json('Dish ' + dishName.name + ' already in favorites')
+  //   }
+  //   const [id_favorite_list] = await knex('favorite_list').insert({
+  //     id_user,
+  //     id_dish
+  //   })
 
-    return response.json({
-      Message: 'Dish add to favorites',
-      Component: id_favorite_list
-    })
-  }
+  //   return response.json({
+  //     Message: 'Dish add to favorites',
+  //     Component: id_favorite_list
+  //   })
+  // }
   async show(request, response) {
     const { id_user, id_dish } = request.body
     const checkDishIsFavorite = await knex('favorite_list')
