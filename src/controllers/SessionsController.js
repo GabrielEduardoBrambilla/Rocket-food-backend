@@ -7,7 +7,6 @@ const { sign } = require('jsonwebtoken')
 class SessionsController {
   async create(request, response) {
     const { email, password } = request.body
-
     const user = await knex('users').where({ email }).first()
 
     if (!user) {
@@ -25,6 +24,7 @@ class SessionsController {
       subject: String(user.id),
       expiresIn
     })
+    console.log({ user, token: token })
 
     return response.json({ user, token: token })
   }
