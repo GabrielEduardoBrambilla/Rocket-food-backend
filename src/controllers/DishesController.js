@@ -1,44 +1,6 @@
 const knex = require('../database/knex')
 
 class DishesController {
-  // Um controller tem no máximo 5 metodos
-  // Index - GET listar varios registros
-  // show - GET listar registro especifico
-  // create - POST para criar um registro
-  // update - PUT para atualizar um registro
-  // delete - DELETE para deletar um registro
-
-  // async create(request, response) {
-  //   const { price, name, category, description, ingredients } = request.body
-
-  //   const dishImage = request.file.filename
-
-  //   const checkDishExists = await knex('dishes').where({ name }).first()
-
-  //   if (checkDishExists) {
-  //     return response
-  //       .status(400)
-  //       .json('Dish with name ' + name + ' already exists')
-  //   }
-  //   const [id_dishes] = await knex('dishes').insert({
-  //     price,
-  //     name,
-  //     image: dishImage,
-  //     category,
-  //     description
-  //   })
-
-  //   const ingredientsInsert = ingredients.map(name => {
-  //     return {
-  //       name,
-  //       id_dishes
-  //     }
-  //   })
-  //   await knex('ingredients').insert(ingredientsInsert)
-
-  //   return response.json()
-  // }
-
   async create(request, response) {
     const { price, name, category, description, ingredients } = request.body
     const dishImage = request.file.filename

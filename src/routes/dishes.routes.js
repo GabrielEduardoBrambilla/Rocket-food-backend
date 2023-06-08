@@ -13,7 +13,7 @@ const dishesController = new DishesController()
 dishesRoutes.post(
   '/',
   ensureAuthenticated,
-  upload.single('avatar'),
+  upload.single('image'),
   dishesController.create
 )
 dishesRoutes.get('/show', dishesController.show)
