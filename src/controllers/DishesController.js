@@ -2,17 +2,20 @@ const knex = require('../database/knex')
 
 class DishesController {
   async create(request, response) {
-    const { price, name, category, description, ingredients } = request.body
-    const dishImage = request.file.filename
-
-    const checkDishExists = await knex('dishes').where({ name }).first()
-    if (checkDishExists) {
-      return response
-        .status(400)
-        .json('Dish with name ' + name + ' already exists')
-    }
-
     try {
+      const { price, name, category, description, ingredients } = request.body
+      // console.log('ingredientsArray:', ingredientsArray)
+      console.log(ingredients)
+      // const ingredientsArray = JSON.parse(ingredients)
+      const dishImage = request.file.filename
+
+      const checkDishExists = await knex('dishes').where({ name }).first()
+      if (checkDishExists) {
+        return response
+          .status(400)
+          .json('Dish with name ' + name + ' already exists')
+      }
+
       await knex.transaction(async transaction => {
         const [idDishes] = await transaction('dishes').insert({
           price,
@@ -21,13 +24,15 @@ class DishesController {
           category,
           description
         })
-        console.log(ingredients.all)
-        const ingredientsInsert = ingredients.map(ingredientName => {
-          return {
-            name: ingredientName,
-            id_dishes: idDishes
-          }
-        })
+
+        console.log('idDishes:', idDishes)
+
+        const ingredientsInsert = ingredientsArray.map(ingredientName => ({
+          name: ingredientName,
+          id_dishes: idDishes
+        }))
+
+        console.log('ingredientsInsert:', ingredientsInsert)
 
         await transaction('ingredients').insert(ingredientsInsert)
       })
