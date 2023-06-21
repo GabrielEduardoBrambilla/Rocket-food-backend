@@ -6,7 +6,7 @@ class DishesController {
       const { price, name, category, description, ingredients } = request.body
       // console.log('ingredientsArray:', ingredientsArray)
       console.log(ingredients)
-      // const ingredientsArray = JSON.parse(ingredients)
+      const ingredientsArray = JSON.parse(ingredients)
       const dishImage = request.file.filename
 
       const checkDishExists = await knex('dishes').where({ name }).first()
