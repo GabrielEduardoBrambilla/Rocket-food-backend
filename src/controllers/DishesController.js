@@ -4,8 +4,6 @@ class DishesController {
   async create(request, response) {
     try {
       const { price, name, category, description, ingredients } = request.body
-      // console.log('ingredientsArray:', ingredientsArray)
-      console.log(ingredients)
       const ingredientsArray = JSON.parse(ingredients)
       const dishImage = request.file.filename
 
@@ -25,14 +23,10 @@ class DishesController {
           description
         })
 
-        console.log('idDishes:', idDishes)
-
         const ingredientsInsert = ingredientsArray.map(ingredientName => ({
           name: ingredientName,
           id_dishes: idDishes
         }))
-
-        console.log('ingredientsInsert:', ingredientsInsert)
 
         await transaction('ingredients').insert(ingredientsInsert)
       })
@@ -44,9 +38,8 @@ class DishesController {
       return response.status(500).json('Error creating dish')
     }
   }
-
   async show(request, response) {
-    const { id } = request.body
+    const { id } = request.params
 
     const dish = await knex('dishes').where({ id }).first()
     const ingredients = await knex('ingredients')
@@ -59,10 +52,16 @@ class DishesController {
     })
   }
   async delete(request, response) {
-    const { id } = request.body
-    await knex('dishes').where({ id }).delete()
+    const { id } = request.params
 
-    return response.json()
+    try {
+      await knex('dishes').where({ id }).delete()
+
+      return response.status(200).json({ message: 'Successfully deleted dish' })
+    } catch (error) {
+      console.error(error)
+      return response.status(500).json({ message: 'Error deleting dish' })
+    }
   }
 
   async index(request, response) {
@@ -99,6 +98,45 @@ class DishesController {
     } catch (error) {
       console.error(error)
       return response.status(500).json({ message: 'Internal server error' })
+    }
+  }
+  async patch(request, response) {
+    const { id } = request.params
+    const { price, name, category, description, ingredients } = request.body
+    const dishImage = request.file ? request.file.filename : null // Updated image filename
+
+    try {
+      // Create an object with the updated dish details
+      const updatedDish = {
+        price,
+        name,
+        category,
+        description
+      }
+
+      // Add the dish image field only if an image is provided
+      if (dishImage) {
+        updatedDish.image = dishImage
+      }
+
+      // Update the dish details
+      await knex('dishes').where({ id }).update(updatedDish)
+
+      // Delete existing dish ingredients
+      await knex('ingredients').where('id_dishes', id).del()
+
+      // Insert updated dish ingredients
+      const ingredientsArray = JSON.parse(ingredients)
+      const ingredientsInsert = ingredientsArray.map(ingredientName => ({
+        name: ingredientName,
+        id_dishes: id
+      }))
+      await knex('ingredients').insert(ingredientsInsert)
+
+      return response.json({ message: 'thanks god' })
+    } catch (error) {
+      console.error(error)
+      return response.status(500).json({ message: 'Error updating dish' })
     }
   }
 }
