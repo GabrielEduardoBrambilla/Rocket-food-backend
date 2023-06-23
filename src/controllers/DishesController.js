@@ -1,4 +1,5 @@
 const knex = require('../database/knex')
+const DiskStorage = require('../providers/DiskStorage')
 
 class DishesController {
   async create(request, response) {
@@ -6,6 +7,8 @@ class DishesController {
       const { price, name, category, description, ingredients } = request.body
       const ingredientsArray = JSON.parse(ingredients)
       const dishImage = request.file.filename
+
+      const diskStorage = new DiskStorage()
 
       const checkDishExists = await knex('dishes').where({ name }).first()
       if (checkDishExists) {
@@ -30,6 +33,7 @@ class DishesController {
 
         await transaction('ingredients').insert(ingredientsInsert)
       })
+      diskStorage.saveFile(dishImage)
 
       return response.json()
     } catch (error) {
@@ -63,29 +67,15 @@ class DishesController {
       return response.status(500).json({ message: 'Error deleting dish' })
     }
   }
-
   async index(request, response) {
-    const { q } = request.query
-
     try {
-      let dishes = await knex('dishes')
-
-      if (q) {
-        dishes = await knex('dishes')
-          .where('name', 'like', `%${q}%`)
-          .orWhere('description', 'like', `%${q}%`)
-      }
+      const dishes = await knex('dishes').select('*')
 
       const dishesWithIngredients = await Promise.all(
         dishes.map(async dish => {
-          const ingredients = await knex('dishes_ingredients')
-            .select('ingredients.name')
-            .join(
-              'ingredients',
-              'dishes_ingredients.ingredient_id',
-              'ingredients.id'
-            )
-            .where('dishes_ingredients.dish_id', dish.id)
+          const ingredients = await knex('ingredients')
+            .select('name')
+            .where('id_dishes', dish.id)
 
           return {
             ...dish,
@@ -100,6 +90,7 @@ class DishesController {
       return response.status(500).json({ message: 'Internal server error' })
     }
   }
+
   async patch(request, response) {
     const { id } = request.params
     const { price, name, category, description, ingredients } = request.body

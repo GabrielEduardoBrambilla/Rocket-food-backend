@@ -16,6 +16,7 @@ dishesRoutes.post(
   upload.single('image'),
   dishesController.create
 )
+
 dishesRoutes.get('/show/:id', dishesController.show)
 dishesRoutes.delete('/delete/:id', dishesController.delete)
 dishesRoutes.get('/index', dishesController.index)
