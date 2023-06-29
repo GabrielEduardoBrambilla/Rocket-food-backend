@@ -2,8 +2,9 @@ const knex = require('../database/knex')
 
 class DishesController {
   async create(request, response) {
-    const { id_user, id_Dish } = request.body
-
+    const { id_user, id_dish } = request.body
+    console.log(id_user)
+    console.log(id_dish)
     const checkDishIsFavorite = await knex('favorite_list')
       .select()
       .where({ id_user, id_dish })
@@ -77,14 +78,14 @@ class DishesController {
       const ingredients = await knex('ingredients')
         .whereIn(
           'id_dishes',
-          dishIds.map(dish => dish.id_Dish)
+          dishIds.map(dish => dish.id_dish)
         )
-        .orderBy(['id_Dishes', 'name'])
+        .orderBy(['id_dishes', 'name'])
 
       const meals = dishes.map(dish => ({
         ...dish,
         ingredients: ingredients.filter(
-          ingredient => ingredient.id_Dishes === dish.id
+          ingredient => ingredient.id_dishes === dish.id
         )
       }))
 
