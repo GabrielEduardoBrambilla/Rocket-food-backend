@@ -3,8 +3,6 @@ const knex = require('../database/knex')
 class DishesController {
   async create(request, response) {
     const { id_user, id_dish } = request.body
-    console.log(id_user)
-    console.log(id_dish)
     const checkDishIsFavorite = await knex('favorite_list')
       .select()
       .where({ id_user, id_dish })
@@ -31,23 +29,21 @@ class DishesController {
     })
   }
   async show(request, response) {
-    const { id_user, id_dish } = request.body
+    var { id_user, id_dish } = request.query
+    // console.log(id_user)
+    // console.log(id_dish)
     const checkDishIsFavorite = await knex('favorite_list')
       .select()
-      .where({ id_user, id_dish })
+      .where({ id_user: id_user, id_dish: id_dish })
       .first()
-    if (checkDishIsFavorite) {
-      const dish = await knex('dishes').where({ id: id_dish }).first()
-      const ingredients = await knex('ingredients')
-        .where({ id_dishes: id_dish })
-        .orderBy('name')
 
+    if (checkDishIsFavorite) {
       return response.json({
-        ...dish,
-        ingredients
+        Message: 'Dish is favorite',
+        favorite: true
       })
     } else {
-      return response.status(400).json('Dish is not favorite')
+      return response.json('Dish is not favorite')
     }
   }
   async delete(request, response) {
