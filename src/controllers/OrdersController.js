@@ -2,37 +2,60 @@ const knex = require('../database/knex')
 
 class OrdersController {
   async create(request, response) {
-    const { id_user, total_price, id_dish, selectedQuantity, dishPrice } =
-      request.body
+    const { id_user, id_dish, selectedQuantity, dishPrice } = request.body
 
-    const openedOrder = await knex('orders')
-      .select()
-      .where({
-        id_user: id_user, // Replace userId with the actual user ID
-        status: 'received'
-      })
-      .first()
-      .returning('id')
-    const id = openedOrder
-      ? openedOrder.id
-      : await knex('orders')
-          .insert({
-            status: 'received',
-            id_user: id_user, // replace userId with the actual user ID
-            total_price: 0, // Assuming the total price will be calculated later
-            created_at: new Date()
+    try {
+      const orderId = await knex.transaction(async trx => {
+        const openedOrder = await trx('orders')
+          .select('id')
+          .where({
+            id_user: id_user,
+            status: 'received'
           })
-          .returning('id')
+          .first()
 
-    console.log(id)
-    await knex('order_items').insert({
-      id_dish,
-      id_order: id,
-      quantity: selectedQuantity,
-      item_price_at_time: dishPrice
-    })
+        if (openedOrder) {
+          return openedOrder.id
+        } else {
+          const insertedOrder = await trx('orders')
+            .insert({
+              status: 'received',
+              id_user: id_user,
+              total_price: 0,
+              created_at: new Date()
+            })
+            .returning('id')
 
-    return response.status(200).json()
+          return insertedOrder[0]
+        }
+      })
+
+      await knex('order_items').insert({
+        id_dish,
+        id_order: orderId,
+        quantity: selectedQuantity,
+        item_price_at_time: dishPrice
+      })
+
+      const currentOrderItems = await knex('order_items')
+        .select()
+        .where({ id_order: orderId })
+
+      const orderTotalPrice = currentOrderItems.reduce(
+        (accumulator, item) =>
+          accumulator + item.quantity * item.item_price_at_time,
+        0
+      )
+
+      await knex('orders').where('id', orderId).update({
+        total_price: orderTotalPrice
+      })
+
+      return response.status(200).json()
+    } catch (error) {
+      console.error(error)
+      return response.status(500).json({ error: 'An error occurred' })
+    }
   }
   async show(request, response) {
     const { id_user, id_dish } = request.body
