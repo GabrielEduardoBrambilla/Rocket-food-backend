@@ -2,52 +2,40 @@ const knex = require('../database/knex')
 
 class OrdersController {
   async create(request, response) {
-    const { id_user, id_dish } = request.body
+    const { id_user, total_price, id_dish, selectedQuantity, dishPrice } =
+      request.body
 
-    const checkDishIsFavorite = await knex('favorite_list')
+    const openedOrder = await knex('orders')
       .select()
-      .where({ id_user, id_dish })
+      .where({
+        id_user: id_user, // Replace userId with the actual user ID
+        status: 'received'
+      })
       .first()
+      .returning('id')
+    const id = openedOrder
+      ? openedOrder.id
+      : await knex('orders')
+          .insert({
+            status: 'received',
+            id_user: id_user, // replace userId with the actual user ID
+            total_price: 0, // Assuming the total price will be calculated later
+            created_at: new Date()
+          })
+          .returning('id')
 
-    const dishName = await knex('dishes')
-      .select('name')
-      .where('dishes.id', id_dish)
-      .first()
-
-    if (checkDishIsFavorite) {
-      return response
-        .status(400)
-        .json('Dish ' + dishName.name + ' already in favorites')
-    }
-    const [id_favorite_list] = await knex('favorite_list').insert({
-      id_user,
-      id_dish
+    console.log(id)
+    await knex('order_items').insert({
+      id_dish,
+      id_order: id,
+      quantity: selectedQuantity,
+      item_price_at_time: dishPrice
     })
 
-    return response.json({
-      Message: 'Dish add to favorites',
-      Component: id_favorite_list
-    })
+    return response.status(200).json()
   }
   async show(request, response) {
     const { id_user, id_dish } = request.body
-    const checkDishIsFavorite = await knex('favorite_list')
-      .select()
-      .where({ id_user, id_dish })
-      .first()
-    if (checkDishIsFavorite) {
-      const dish = await knex('dishes').where({ id: id_dish }).first()
-      const ingredients = await knex('ingredients')
-        .where({ id_dishes: id_dish })
-        .orderBy('name')
-
-      return response.json({
-        ...dish,
-        ingredients
-      })
-    } else {
-      return response.status(400).json('Dish is not favorite')
-    }
   }
   async delete(request, response) {
     const { id_user, id_dish } = request.body
@@ -59,39 +47,7 @@ class OrdersController {
   async index(request, response) {
     const { id_user } = request.body
 
-    const favoriteList = await knex('favorite_list')
-      .select('id_dish')
-      .where({ id_user })
-      .first()
-
-    if (favoriteList) {
-      const dishIds = await knex('favorite_list')
-        .select('id_dish')
-        .where({ id_user })
-
-      const dishes = await knex('dishes').whereIn(
-        'id',
-        dishIds.map(dish => dish.id_dish)
-      )
-
-      const ingredients = await knex('ingredients')
-        .whereIn(
-          'id_dishes',
-          dishIds.map(dish => dish.id_dish)
-        )
-        .orderBy(['id_dishes', 'name'])
-
-      const meals = dishes.map(dish => ({
-        ...dish,
-        ingredients: ingredients.filter(
-          ingredient => ingredient.id_dishes === dish.id
-        )
-      }))
-
-      return response.json(meals)
-    } else {
-      return response.status(400).json('User does not have a favorite list')
-    }
+    return response.status(400).json('User does not have a favorite list')
   }
 }
 
