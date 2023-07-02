@@ -46,7 +46,6 @@ class OrdersController {
           accumulator + item.quantity * item.item_price_at_time,
         0
       )
-
       await knex('orders').where('id', orderId).update({
         total_price: orderTotalPrice
       })
@@ -68,9 +67,44 @@ class OrdersController {
     return response.json('removed from favorites')
   }
   async index(request, response) {
-    const { id_user } = request.body
+    const id_user = request.params.id
 
-    return response.status(400).json('User does not have a favorite list')
+    const orderId = await knex('orders')
+      .select('id')
+      .where({
+        id_user,
+        status: 'received'
+      })
+      .first()
+
+    if (!orderId) {
+      return response.status(200).json([])
+    }
+
+    const orderItems = await knex('order_items')
+      .select('quantity', 'item_price_at_time', 'id_dish')
+      .where({
+        id_order: orderId.id
+      })
+
+    const dishIds = orderItems.map(item => item.id_dish)
+
+    const dishes = await knex('dishes')
+      .select('id', 'name', 'image')
+      .whereIn('id', dishIds)
+
+    const result = orderItems.map(item => {
+      const dish = dishes.find(dish => dish.id === item.id_dish)
+      return {
+        dish_id: item.id_dish,
+        dish_img: dish.image,
+        dish_name: dish.name,
+        quantity: item.quantity,
+        item_price_at_time: item.item_price_at_time
+      }
+    })
+
+    return response.status(200).json(result)
   }
 }
 
