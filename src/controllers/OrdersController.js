@@ -30,12 +30,33 @@ class OrdersController {
         }
       })
 
-      await knex('order_items').insert({
-        id_dish,
-        id_order: orderId,
-        quantity: selectedQuantity,
-        item_price_at_time: dishPrice
-      })
+      const dishExists = await knex('order_items')
+        .select()
+        .where({
+          id_dish,
+          id_order: orderId,
+          item_price_at_time: dishPrice
+        })
+        .first()
+      if (dishExists) {
+        await knex('order_items')
+          .update({
+            quantity: selectedQuantity
+          })
+          .where({
+            id_dish,
+            id_order: orderId,
+            // quantity: dishExists,
+            item_price_at_time: dishPrice
+          })
+      } else {
+        await knex('order_items').insert({
+          id_dish,
+          id_order: orderId,
+          quantity: selectedQuantity,
+          item_price_at_time: dishPrice
+        })
+      }
 
       const currentOrderItems = await knex('order_items')
         .select()
