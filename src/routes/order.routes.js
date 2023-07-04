@@ -5,7 +5,7 @@ const OrdersController = require('../controllers/OrdersController')
 const ordersController = new OrdersController()
 
 ordersRoutes.post('/', ordersController.create)
-ordersRoutes.get('/show', ordersController.show)
+ordersRoutes.patch('/update', ordersController.update)
 ordersRoutes.delete('/delete', ordersController.delete)
 ordersRoutes.get('/index/:id', ordersController.index)
 

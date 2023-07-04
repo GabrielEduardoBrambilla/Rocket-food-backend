@@ -3,7 +3,6 @@ const knex = require('../database/knex')
 class OrdersController {
   async create(request, response) {
     const { id_user, id_dish, selectedQuantity, dishPrice } = request.body
-
     try {
       const orderId = await knex.transaction(async trx => {
         const openedOrder = await trx('orders')
@@ -77,15 +76,102 @@ class OrdersController {
       return response.status(500).json({ error: 'An error occurred' })
     }
   }
-  async show(request, response) {
-    const { id_user, id_dish } = request.body
+  async update(request, response) {
+    const { id_user, id_dish, selectedQuantity, dishPrice } = request.body
+    try {
+      const orderId = await knex.transaction(async trx => {
+        const openedOrder = await trx('orders')
+          .select('id')
+          .where({
+            id_user: id_user,
+            status: 'received'
+          })
+          .first()
+
+        if (openedOrder) {
+          return openedOrder.id
+        } else {
+          return response.status(500).json('Order not found')
+        }
+      })
+
+      const dishExists = await knex('order_items')
+        .select()
+        .where({
+          id_dish: id_dish,
+          id_order: orderId
+        })
+        .first()
+      if (dishExists) {
+        await knex('order_items')
+          .update({
+            quantity: selectedQuantity
+          })
+          .where({
+            id_dish: id_dish,
+            id_order: orderId,
+            item_price_at_time: dishPrice
+          })
+      } else {
+        return response.status(500).json('Dish not found')
+      }
+
+      const currentOrderItems = await knex('order_items')
+        .select()
+        .where({ id_order: orderId })
+
+      const orderTotalPrice = currentOrderItems.reduce(
+        (accumulator, item) =>
+          accumulator + item.quantity * item.item_price_at_time,
+        0
+      )
+      await knex('orders').where('id', orderId).update({
+        total_price: orderTotalPrice
+      })
+
+      return response.status(200).json()
+    } catch (error) {
+      console.error(error)
+      return response.status(500).json({ error: 'An error occurred' })
+    }
   }
   async delete(request, response) {
     const { id_user, id_dish } = request.body
+    try {
+      const orderId = await knex.transaction(async trx => {
+        const openedOrder = await trx('orders')
+          .select('id')
+          .where({
+            id_user: id_user,
+            status: 'received'
+          })
+          .first()
 
-    await knex('favorite_list').where({ id_dish, id_user }).delete()
-
-    return response.json('removed from favorites')
+        if (openedOrder) {
+          return openedOrder.id
+        } else {
+          return response.status(500).json('Order not found')
+        }
+      })
+      const dishExists = await knex('order_items')
+        .select()
+        .where({
+          id_dish: id_dish,
+          id_order: orderId
+        })
+        .first()
+      if (dishExists) {
+        await knex('order_items')
+          .where({ id_dish: id_dish, id_order: orderId })
+          .delete()
+      } else {
+        return response.status(500).json('Dish not found')
+      }
+      return response.status(200).json()
+    } catch (error) {
+      console.error(error)
+      return response.status(500).json({ error: 'An error occurred' })
+    }
   }
   async index(request, response) {
     const id_user = request.params.id
