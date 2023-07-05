@@ -13,7 +13,6 @@ const routes = Router()
 routes.use('/users', usersRouter)
 routes.use('/dishes', dishesRouter)
 routes.use('/favoritelist', favoriteListRouter)
-routes.use('/shoppingcart', shoppingCartRouter)
 routes.use('/ingredients', ingredientsRouter)
 // Create order controller
 routes.use('/order', ordersRouter)
