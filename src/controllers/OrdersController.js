@@ -2,7 +2,9 @@ const knex = require('../database/knex')
 
 class OrdersController {
   async create(request, response) {
-    const { id_user, id_dish, selectedQuantity, dishPrice } = request.body
+    const { id_dish, selectedQuantity, dishPrice } = request.body
+    const id_user = request.user.id
+
     try {
       const orderId = await knex.transaction(async trx => {
         const openedOrder = await trx('orders')
@@ -77,7 +79,9 @@ class OrdersController {
     }
   }
   async update(request, response) {
-    const { id_user, id_dish, selectedQuantity, dishPrice } = request.body
+    const { id_dish, selectedQuantity, dishPrice } = request.body
+    const id_user = request.user.id
+
     try {
       const orderId = await knex.transaction(async trx => {
         const openedOrder = await trx('orders')
@@ -136,7 +140,9 @@ class OrdersController {
     }
   }
   async delete(request, response) {
-    const { id_user, id_dish } = request.body
+    const { id_dish } = request.body
+    const id_user = request.user.id
+
     try {
       const orderId = await knex.transaction(async trx => {
         const openedOrder = await trx('orders')
@@ -174,7 +180,7 @@ class OrdersController {
     }
   }
   async index(request, response) {
-    const id_user = request.params.id
+    const id_user = request.user.id
 
     const orderId = await knex('orders')
       .select('id')
