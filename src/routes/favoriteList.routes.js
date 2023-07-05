@@ -6,9 +6,11 @@ const favListController = new FavoriteListController()
 
 const ensureAuthenticated = require('../middlewares/ensureAuthenticated')
 
-favListRoutes.post('/', ensureAuthenticated, favListController.create)
-favListRoutes.get('/show', ensureAuthenticated, favListController.show)
-favListRoutes.delete('/delete', ensureAuthenticated, favListController.delete)
-favListRoutes.get('/index', ensureAuthenticated, favListController.index)
+favListRoutes.use(ensureAuthenticated)
+
+favListRoutes.post('/', favListController.create)
+favListRoutes.get('/show', favListController.show)
+favListRoutes.delete('/delete', favListController.delete)
+favListRoutes.get('/index', favListController.index)
 
 module.exports = favListRoutes

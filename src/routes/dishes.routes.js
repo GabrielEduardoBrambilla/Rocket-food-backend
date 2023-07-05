@@ -10,12 +10,9 @@ const upload = multer(uploadConfig.MULTER)
 const DishesController = require('../controllers/DishesController')
 const dishesController = new DishesController()
 
-dishesRoutes.post(
-  '/',
-  ensureAuthenticated,
-  upload.single('image'),
-  dishesController.create
-)
+dishesRoutes.use(ensureAuthenticated)
+
+dishesRoutes.post('/', upload.single('image'), dishesController.create)
 
 dishesRoutes.get('/show/:id', dishesController.show)
 dishesRoutes.delete('/delete/:id', dishesController.delete)
