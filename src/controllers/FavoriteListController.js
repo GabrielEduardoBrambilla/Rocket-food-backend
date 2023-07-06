@@ -7,7 +7,7 @@ class DishesController {
 
     const checkDishIsFavorite = await knex('favorite_list')
       .select()
-      .where({ id_user, id_dish })
+      .where({ id_user: id_user, id_dish: id_dish })
       .first()
 
     const dishName = await knex('dishes')
@@ -21,8 +21,8 @@ class DishesController {
         .json('Dish ' + dishName.name + ' already in favorites')
     }
     const [id_favorite_list] = await knex('favorite_list').insert({
-      id_user,
-      id_dish
+      id_user: id_user,
+      id_dish: id_dish
     })
 
     return response.json({
