@@ -1,4 +1,6 @@
 require('express-async-errors')
+require('dotenv/config')
+
 const migrationsRunner = require('./database/sqlite/migrations')
 const AppError = require('./utils/AppError')
 
@@ -7,12 +9,41 @@ const cors = require('cors')
 const express = require('express')
 
 const routes = require('./routes')
-
 const uploadConfig = require('./configs/upload')
+const app = express()
+
+// STRIPE NEW
+// const another_env = require('dotenv').config({ path: './.env' })
+const env = require('dotenv').config({ path: './.env' })
+
+app.get('/config', (req, res) => {
+  res.send({
+    publishableKey: process.env.STRIPE_PUBLISHABLE_KEY
+  })
+})
+
+app.post('/create-payment-intent', cors(), async (req, res) => {
+  try {
+    const paymentIntent = await stripe.paymentIntents.create({
+      currency: 'EUR',
+      amount: 1999,
+      automatic_payment_methods: { enabled: true }
+    })
+
+    // Send publishable key and PaymentIntent details to client
+    res.send({
+      clientSecret: paymentIntent.client_secret
+    })
+  } catch (e) {
+    return res.status(400).send({
+      error: {
+        message: e.message
+      }
+    })
+  }
+})
 
 migrationsRunner()
-
-const app = express()
 
 app.use(cors())
 app.use(express.json())
