@@ -1,15 +1,18 @@
 class PaymentController {
   async create(request, response) {
     const { orderPrice } = request.body
+    const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
+
     try {
       console.log('Before paymentIntent: ')
 
       const paymentIntent = await stripe.paymentIntents.create({
-        amount: 1099,
-        currency: 'usd',
-        payment_method_types: ['card']
+        currency: 'EUR',
+        amount: orderPrice,
+        automatic_payment_methods: { enabled: true }
       })
-      console.log('passed paymentIntent: ' + paymentIntent)
+
+      console.log('passed paymentIntent: ' + paymentIntent.client_secret)
 
       // Send publishable key and PaymentIntent details to client
       return response
