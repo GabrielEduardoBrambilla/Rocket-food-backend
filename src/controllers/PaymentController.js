@@ -5,6 +5,7 @@ class PaymentController {
     const { orderPrice } = request.body
     const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
     const id_user = request.user.id
+    const cleanedPrice = orderPrice.toString().replace('.', '')
 
     try {
       const orderPaymentIntend = await knex.transaction(async trx => {
@@ -24,8 +25,13 @@ class PaymentController {
       })
       if (orderPaymentIntend) {
         const paymentIntent = await stripe.paymentIntents.retrieve(
-          'pi_3NRwznGx2rwi3ccL1E2NJEG9'
+          orderPaymentIntend
         )
+
+        await stripe.paymentIntents.update(orderPaymentIntend, {
+          amount: parseInt(cleanedPrice)
+        })
+
         return response
           .status(200)
           .json({ clientSecret: paymentIntent.client_secret })
@@ -52,7 +58,7 @@ class PaymentController {
         // Create a payment Intent then
         const paymentIntent = await stripe.paymentIntents.create({
           currency: 'EUR',
-          amount: orderPrice,
+          amount: cleanedPrice,
           automatic_payment_methods: {
             enabled: true
           }
