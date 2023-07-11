@@ -4,15 +4,13 @@ class PaymentController {
     const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 
     try {
-      console.log('Before paymentIntent: ')
-
       const paymentIntent = await stripe.paymentIntents.create({
         currency: 'EUR',
         amount: orderPrice,
-        automatic_payment_methods: { enabled: true }
+        automatic_payment_methods: {
+          enabled: true
+        }
       })
-
-      console.log('passed paymentIntent: ' + paymentIntent.client_secret)
 
       // Send publishable key and PaymentIntent details to client
       return response
