@@ -5,7 +5,9 @@ const knex = require('../database/knex')
 
 class UsersController {
   async create(request, response) {
-    const { name, email, password } = request.body
+    const { is_Adm, name, email, password } = request.body
+
+    const is_Admin = is_Adm === undefined ? 0 : 1
 
     const database = await sqliteConnection()
     const checkUserExist = await database.get(
@@ -20,8 +22,8 @@ class UsersController {
     const hashedPassword = await hash(password, 8)
 
     await database.run(
-      'INSERT INTO users (name, email, password) VALUES (?,?,?)',
-      [name, email, hashedPassword]
+      'INSERT INTO users (is_Admin, name, email, password) VALUES (?,?,?)',
+      [is_Admin, name, email, hashedPassword]
     )
 
     return response.status(201).json()
