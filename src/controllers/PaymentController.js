@@ -75,9 +75,9 @@ class PaymentController {
           id_user,
           id: orderId
         })
-
+      console.log('Updated order')
       return response.status(200).json({
-        redirect: '/orders/successfulPayment'
+        redirect: '/order/successfulPayment'
       })
     } catch (e) {
       console.log(e.message)
