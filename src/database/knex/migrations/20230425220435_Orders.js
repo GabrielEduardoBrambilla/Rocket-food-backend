@@ -2,7 +2,7 @@ exports.up = knex =>
   knex.schema.createTable('orders', function (table) {
     table.increments('id').primary()
     table
-      .enum('status', ['received', 'preparing', 'delivered'])
+      .enum('status', ['received', 'paid'])
       .notNullable()
       .defaultTo('received')
     table.bigInteger('id_user').unsigned().notNullable()

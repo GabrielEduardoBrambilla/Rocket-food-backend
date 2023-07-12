@@ -8,5 +8,6 @@ const ensureAuthenticated = require('../middlewares/ensureAuthenticated')
 paymentRoutes.use(ensureAuthenticated)
 paymentRoutes.post('/create', paymentController.create)
 paymentRoutes.get('/config', paymentController.show)
+paymentRoutes.patch('/update', paymentController.update)
 
 module.exports = paymentRoutes
