@@ -9,6 +9,26 @@ class UsersController {
 
     const is_Admin = is_Adm === undefined ? 0 : 1
 
+    if (
+      is_Adm === undefined ||
+      name === undefined ||
+      email === undefined ||
+      password === undefined
+    ) {
+      if (is_Adm === undefined) {
+        console.log('is_Adm is undefined')
+      }
+      if (name === undefined) {
+        console.log('name is undefined')
+      }
+      if (email === undefined) {
+        console.log('email is undefined')
+      }
+      if (password === undefined) {
+        console.log('password is undefined')
+      }
+    }
+
     const database = await sqliteConnection()
     const checkUserExist = await database.get(
       'SELECT * FROM users WHERE email = (?)',
