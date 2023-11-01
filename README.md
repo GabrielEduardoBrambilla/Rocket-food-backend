@@ -107,6 +107,9 @@ STRIPE_SECRET_KEY=
 AUTH_SCECRET=
 SERVER_PORT=
 
+#Starts database
+$ npm run migrate
+
 # Run the project
 $ npm run dev
 
