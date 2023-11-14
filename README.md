@@ -110,6 +110,9 @@ SERVER_PORT=
 #Starts database
 $ npm run migrate
 
+#Populate database
+$ npm run seed
+
 # Run the project
 $ npm run dev
 
