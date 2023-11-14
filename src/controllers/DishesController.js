@@ -6,7 +6,6 @@ class DishesController {
     try {
       const { price, name, category, description, ingredients } = request.body
       const ingredientsArray = JSON.parse(ingredients)
-      const dishImage = request.file.filename
 
       const diskStorage = new DiskStorage()
 
@@ -21,7 +20,6 @@ class DishesController {
         const [idDishes] = await transaction('dishes').insert({
           price,
           name,
-          image: dishImage,
           category,
           description
         })
@@ -91,10 +89,15 @@ class DishesController {
     }
   }
 
-  async patch(request, response) {
-    const { id } = request.params
-    const { price, name, category, description, ingredients } = request.body
-    const dishImage = request.file ? request.file.filename : null // Updated image filename
+  async patching(request, response) {
+    const { price, name, category, description, ingredients, id } = request.body
+    const ingredientsArray = JSON.parse(ingredients)
+    console.log('Dish// ')
+    console.log(price)
+    console.log(name)
+    console.log(category)
+    console.log(description)
+    console.log(id)
 
     try {
       // Create an object with the updated dish details
@@ -103,11 +106,6 @@ class DishesController {
         name,
         category,
         description
-      }
-
-      // Add the dish image field only if an image is provided
-      if (dishImage) {
-        updatedDish.image = dishImage
       }
 
       // Update the dish details
@@ -119,9 +117,10 @@ class DishesController {
       // Insert updated dish ingredients
       const ingredientsArray = JSON.parse(ingredients)
       const ingredientsInsert = ingredientsArray.map(ingredientName => ({
-        name: ingredientName,
+        name: ingredientName.name,
         id_dishes: id
       }))
+      console.log(ingredientsInsert)
       await knex('ingredients').insert(ingredientsInsert)
 
       return response.json({ message: 'thanks god' })
