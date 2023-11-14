@@ -5,6 +5,9 @@ module.exports = {
     connection: {
       filename: path.resolve(__dirname, 'src', 'database', 'database.db')
     },
+    seeds: {
+      directory: path.resolve(__dirname, 'src', 'database', 'knex', 'seeds')
+    },
     migrations: {
       directory: path.resolve(
         __dirname,
