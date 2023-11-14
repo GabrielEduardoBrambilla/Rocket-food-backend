@@ -6,7 +6,7 @@ class DishesController {
     try {
       const { price, name, category, description, ingredients } = request.body
       const ingredientsArray = JSON.parse(ingredients)
-
+      const dishImage = request.file.filename
       const diskStorage = new DiskStorage()
 
       const checkDishExists = await knex('dishes').where({ name }).first()
@@ -20,6 +20,7 @@ class DishesController {
         const [idDishes] = await transaction('dishes').insert({
           price,
           name,
+          image: dishImage,
           category,
           description
         })
@@ -55,9 +56,9 @@ class DishesController {
   }
   async delete(request, response) {
     const { id } = request.params
-
     try {
       await knex('dishes').where({ id }).delete()
+      console.log('rota')
 
       return response.status(200).json({ message: 'Successfully deleted dish' })
     } catch (error) {
