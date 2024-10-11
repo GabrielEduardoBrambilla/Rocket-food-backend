@@ -16,7 +16,7 @@ class UsersController {
     )
 
     if (checkUserExist) {
-      throw new AppError('Este email já foi registrado').statusCode(400)
+      throw new AppError('Este email já foi registrado')
     }
 
     const hashedPassword = await hash(password, 8)
